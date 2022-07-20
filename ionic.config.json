@@ -1,0 +1,7 @@
+{
+  "name": "super-organizador",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
