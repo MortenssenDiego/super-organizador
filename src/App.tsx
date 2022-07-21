@@ -1,5 +1,6 @@
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar, setupIonicReact } from '@ionic/react';
+import { calendarOutline, homeOutline, sunny } from 'ionicons/icons'
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 
@@ -21,22 +22,48 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import EventsContextProvider from './data/EventsContextProvider';
+import Events from './pages/Events/Events';
+import AddEvent from './pages/Events/AddEvent';
 
 setupIonicReact();
 
 const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
+	<IonApp>
+		<IonReactRouter>
+				<IonMenu side="start" contentId="superOrganizadorM1">
+					<IonHeader>
+						<IonToolbar>
+							<IonTitle><IonIcon color="warning" icon={sunny} size='large' /></IonTitle>
+						</IonToolbar>
+					</IonHeader>
+					<IonContent>
+						<IonList>
+							<IonMenuToggle>
+								<IonItem routerLink='/home' routerDirection='none' lines='none'>
+									<IonIcon color="medium" slot="start" icon={homeOutline} />
+									<IonLabel>Inicio</IonLabel>
+								</IonItem>
+							</IonMenuToggle>
+							<IonMenuToggle>
+								<IonItem routerLink='/events' routerDirection='none' lines='none'>
+									<IonIcon color="medium" slot="start" icon={calendarOutline} />
+									<IonLabel>Eventos</IonLabel>
+								</IonItem>
+							</IonMenuToggle>
+						</IonList>
+					</IonContent>
+				</IonMenu>
+			<EventsContextProvider>
+				<IonRouterOutlet id="superOrganizadorM1">
+					<Route exact path="/home" component={Home} />
+					<Route exact path="/events" component={Events} />
+					<Route exact path="/add-event" component={AddEvent} />
+					<Redirect to="/home" />
+				</IonRouterOutlet>
+			</EventsContextProvider>
+		</IonReactRouter>
+	</IonApp>
 );
 
 export default App;

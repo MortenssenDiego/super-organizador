@@ -1,25 +1,26 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
-import './Home.css';
+import React, { useContext } from 'react';
+import { IonCol, IonContent, IonGrid, IonPage, IonRow } from '@ionic/react';
+import RainHeader from '../components/RainHeader';
+import EventsContext from '../data/events-context';
 
 const Home: React.FC = () => {
-  return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Blank</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Blank</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <ExploreContainer />
-      </IonContent>
-    </IonPage>
-  );
+	const eventsContext = useContext(EventsContext);
+
+	return (
+		<IonPage>
+			<RainHeader title="Super Organizador" />
+			<IonContent>
+				<IonGrid>
+					<IonRow>
+						<IonCol className="ion-text-center">
+							<h6>Inicio</h6>
+						</IonCol>
+					</IonRow>
+
+				</IonGrid>
+			</IonContent>
+		</IonPage>
+	);
 };
 
 export default Home;
