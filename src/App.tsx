@@ -1,3 +1,4 @@
+import React, { useContext } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar, setupIonicReact } from '@ionic/react';
 import { calendarOutline, homeOutline, sunny } from 'ionicons/icons'
@@ -22,48 +23,77 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import EventsContextProvider from './data/EventsContextProvider';
+import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
+import EventsContextProvider from './data/events/EventsContextProvider';
 import Events from './pages/Events/Events';
 import AddEvent from './pages/Events/AddEvent';
+import UserSessionContext from './data/user/user-session-context';
+import Register from './pages/Authentication/Register';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-	<IonApp>
-		<IonReactRouter>
-				<IonMenu side="start" contentId="superOrganizadorM1">
-					<IonHeader>
-						<IonToolbar>
-							<IonTitle><IonIcon color="warning" icon={sunny} size='large' /></IonTitle>
-						</IonToolbar>
-					</IonHeader>
-					<IonContent>
-						<IonList>
-							<IonMenuToggle>
-								<IonItem routerLink='/home' routerDirection='none' lines='none'>
-									<IonIcon color="medium" slot="start" icon={homeOutline} />
-									<IonLabel>Inicio</IonLabel>
-								</IonItem>
-							</IonMenuToggle>
-							<IonMenuToggle>
-								<IonItem routerLink='/events' routerDirection='none' lines='none'>
-									<IonIcon color="medium" slot="start" icon={calendarOutline} />
-									<IonLabel>Eventos</IonLabel>
-								</IonItem>
-							</IonMenuToggle>
-						</IonList>
-					</IonContent>
-				</IonMenu>
-			<EventsContextProvider>
-				<IonRouterOutlet id="superOrganizadorM1">
-					<Route exact path="/home" component={Home} />
-					<Route exact path="/events" component={Events} />
-					<Route exact path="/add-event" component={AddEvent} />
-					<Redirect to="/home" />
-				</IonRouterOutlet>
-			</EventsContextProvider>
-		</IonReactRouter>
-	</IonApp>
-);
+const App: React.FC = () => {
+	const userSessionContext = useContext(UserSessionContext);
+
+	const auth = getAuth();
+	getRedirectResult(auth)
+		.then((result) => {
+			if (result)
+				userSessionContext.signInWithGoogle(result);
+		}).catch((error) => {
+			// Handle Errors here.
+			const errorCode = error.code;
+			const errorMessage = error.message;
+			// The email of the user's account used.
+			const email = error.customData.email;
+			// The AuthCredential type that was used.
+			const credential = GoogleAuthProvider.credentialFromError(error);
+			// ...
+		});
+
+	return (
+		<IonApp>
+			<IonReactRouter>
+				{
+					userSessionContext.user.uid ?
+						<>
+							<IonMenu side="start" contentId="superOrganizadorM1">
+								<IonHeader>
+									<IonToolbar>
+										<IonTitle><IonIcon color="warning" icon={sunny} size='large' /></IonTitle>
+									</IonToolbar>
+								</IonHeader>
+								<IonContent>
+									<IonList>
+										<IonMenuToggle>
+											<IonItem routerLink='/home' routerDirection='none' lines='none'>
+												<IonIcon color="medium" slot="start" icon={homeOutline} />
+												<IonLabel>Inicio</IonLabel>
+											</IonItem>
+										</IonMenuToggle>
+										<IonMenuToggle>
+											<IonItem routerLink='/events' routerDirection='none' lines='none'>
+												<IonIcon color="medium" slot="start" icon={calendarOutline} />
+												<IonLabel>Eventos</IonLabel>
+											</IonItem>
+										</IonMenuToggle>
+									</IonList>
+								</IonContent>
+							</IonMenu>
+							<EventsContextProvider>
+								<IonRouterOutlet id="superOrganizadorM1">
+									<Route exact path="/home" component={Home} />
+									<Route exact path="/events" component={Events} />
+									<Route exact path="/add-event" component={AddEvent} />
+									<Redirect to="/home" />
+								</IonRouterOutlet>
+							</EventsContextProvider>
+						</> :
+						<Register />
+				}
+			</IonReactRouter>
+		</IonApp >
+	);
+}
 
 export default App;

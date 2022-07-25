@@ -1,12 +1,19 @@
 import React, { useContext, useState } from 'react';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonIcon, IonLabel, IonPage, IonRow, IonSegment, IonSegmentButton } from '@ionic/react';
+import { IonAlert, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonIcon, IonLabel, IonPage, IonRow, IonSegment, IonSegmentButton } from '@ionic/react';
 import RainHeader from '../../components/RainHeader';
-import EventsContext from '../../data/events-context';
+import EventsContext, { Event } from '../../data/events/events-context';
 import { add } from 'ionicons/icons';
 
 const Events: React.FC = () => {
     const eventsContext = useContext(EventsContext);
     const [tab, setTab] = useState('pending');
+    const [showAlert, setShowAlert] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+    const handleFinish = (event: Event) => {
+        setSelectedEvent(event);
+        setShowAlert(true);
+    }
 
     return (
         <IonPage>
@@ -27,13 +34,13 @@ const Events: React.FC = () => {
                 </IonSegment>
                 <IonGrid>
                     {
-                        eventsContext.events.filter(e => tab === 'pending' ? !e.isFinished : e.isFinished).map(event => (
+                        eventsContext.events.filter(e => tab === 'pending' ? !e.isFinished : e.isFinished).map((event: Event) => (
                             <IonRow key={event.id} >
                                 <IonCol className="ion-text-center">
                                     <IonCard>
                                         <IonCardHeader>
                                             <h5>{event.title}</h5>
-                                            <IonCardSubtitle>{`${new Date(event.date).toLocaleDateString()} - ${new Date(event.date).getHours()}:${new Date(event.date).getMinutes().toString().length === 1 ? `0${new Date(event.date).getMinutes()}` : `${new Date(event.date).getMinutes()}`} hs`}</IonCardSubtitle>
+                                            <IonCardSubtitle>{event.date}</IonCardSubtitle>
                                         </IonCardHeader>
                                         <IonCardContent>
                                             {
@@ -42,7 +49,7 @@ const Events: React.FC = () => {
                                             {
                                                 event.isFinished ?
                                                     <p>Evento finalizado</p> :
-                                                    <IonButton fill='outline'>
+                                                    <IonButton fill='outline' onClick={() => handleFinish(event)}>
                                                         Finalizar Evento
                                                     </IonButton>
                                             }
@@ -53,6 +60,21 @@ const Events: React.FC = () => {
                         ))
                     }
                 </IonGrid>
+                {selectedEvent && <IonAlert
+                    isOpen={showAlert}
+                    onDidDismiss={() => setShowAlert(false)}
+                    header="Finalizar Actividad"
+                    message={`Estás seguro de finalizar ${selectedEvent?.title}`}
+                    buttons={[{
+                        text: 'Cancelar',
+                        role: 'cancel',
+                      },
+                      {
+                        text: 'Finalizar',
+                        role: 'confirm',
+                        handler: () => { eventsContext.finishEvent(selectedEvent?.id); }
+                      }]}
+                />}
             </IonContent>
         </IonPage>
     );

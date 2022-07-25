@@ -1,11 +1,9 @@
 import React, { useContext } from 'react';
 import { IonCol, IonContent, IonGrid, IonPage, IonRow } from '@ionic/react';
 import RainHeader from '../components/RainHeader';
-import EventsContext from '../data/events-context';
+import Register from './Authentication/Register';
 
 const Home: React.FC = () => {
-	const eventsContext = useContext(EventsContext);
-
 	return (
 		<IonPage>
 			<RainHeader title="Super Organizador" />
