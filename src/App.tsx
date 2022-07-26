@@ -29,16 +29,32 @@ import AddEvent from './pages/Events/AddEvent';
 import UserSessionContext from './data/user/user-session-context';
 
 /* User Authentication */
-import Register from './pages/Authentication/Register';
+import LoginButton from './pages/Authentication/LoginButton';
 import { useAuth0 } from "@auth0/auth0-react";
+import { App as CapApp } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
+import { callbackUri } from './auth.config';
 
 setupIonicReact();
 
 const App: React.FC = () => {
 	const userSessionContext = useContext(UserSessionContext);
-	const { user, isAuthenticated, isLoading } = useAuth0();
+	const { user, isAuthenticated, isLoading, handleRedirectCallback } = useAuth0();
 
-	useEffect(()=> {
+	CapApp.addListener('appUrlOpen', async ({ url }) => {
+		if (url.startsWith(callbackUri)) {
+			if (
+			  url.includes("state") &&
+			  (url.includes("code") || url.includes("error"))
+			) {
+			  await handleRedirectCallback(url);
+			}
+		}
+		// No-op on Android
+		await Browser.close();
+	});
+
+	useEffect(() => {
 		if (!user) return;
 
 		userSessionContext.user.uid = user.sub || '';
@@ -83,7 +99,7 @@ const App: React.FC = () => {
 								</IonRouterOutlet>
 							</EventsContextProvider>
 						</> :
-						<Register />
+						<LoginButton />
 				}
 			</IonReactRouter>
 		</IonApp >

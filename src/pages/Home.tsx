@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { IonCol, IonContent, IonGrid, IonPage, IonRow } from '@ionic/react';
 import RainHeader from '../components/RainHeader';
-import Register from './Authentication/Register';
+import LogoutButton from './Authentication/LogoutButton';
 
 const Home: React.FC = () => {
 	return (
@@ -12,6 +12,7 @@ const Home: React.FC = () => {
 					<IonRow>
 						<IonCol className="ion-text-center">
 							<h6>Inicio</h6>
+							<LogoutButton />
 						</IonCol>
 					</IonRow>
 

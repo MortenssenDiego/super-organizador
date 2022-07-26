@@ -5,15 +5,17 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import UserSessionContextProvider from './data/user/UserSessionContextProvider';
 import { Auth0Provider } from "@auth0/auth0-react";
+import { domain as auth0Domain, clientId, callbackUri } from "./auth.config";
+
 
 ReactDOM.render(
 	<React.StrictMode>
 		<Auth0Provider
-			domain="dev-za6-76vz.us.auth0.com"
-			clientId="NjSeqzdpa2UpKIdNYGXAMj26j15dhnL8"
-			audience="https://dev-za6-76vz.us.auth0.com/api/v2/"
-			scope="read:current_user update:current_user_metadata"
-			redirectUri={window.location.origin}
+			domain={auth0Domain}
+			clientId={clientId}
+			redirectUri={callbackUri}
+			useRefreshTokens
+			cacheLocation="localstorage"
 		>
 			<UserSessionContextProvider>
 				<App />

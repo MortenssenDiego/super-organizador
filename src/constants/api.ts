@@ -1,1 +1,1 @@
-export const API_SERVER: string = "https://192.168.100.200:9000/api/v1"
+export const API_SERVER: string = "http://192.168.100.200:9000/api/v1"

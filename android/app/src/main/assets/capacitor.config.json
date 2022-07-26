@@ -1,0 +1,6 @@
+{
+	"appId": "com.superorganizador.app",
+	"appName": "super-organizador",
+	"webDir": "build",
+	"bundledWebRuntime": false
+}
