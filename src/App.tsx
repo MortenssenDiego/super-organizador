@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar, setupIonicReact } from '@ionic/react';
 import { calendarOutline, homeOutline, sunny } from 'ionicons/icons'
@@ -23,39 +23,33 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 import EventsContextProvider from './data/events/EventsContextProvider';
 import Events from './pages/Events/Events';
 import AddEvent from './pages/Events/AddEvent';
 import UserSessionContext from './data/user/user-session-context';
+
+/* User Authentication */
 import Register from './pages/Authentication/Register';
+import { useAuth0 } from "@auth0/auth0-react";
 
 setupIonicReact();
 
 const App: React.FC = () => {
 	const userSessionContext = useContext(UserSessionContext);
+	const { user, isAuthenticated, isLoading } = useAuth0();
 
-	const auth = getAuth();
-	getRedirectResult(auth)
-		.then((result) => {
-			if (result)
-				userSessionContext.signInWithGoogle(result);
-		}).catch((error) => {
-			// Handle Errors here.
-			const errorCode = error.code;
-			const errorMessage = error.message;
-			// The email of the user's account used.
-			const email = error.customData.email;
-			// The AuthCredential type that was used.
-			const credential = GoogleAuthProvider.credentialFromError(error);
-			// ...
-		});
+	useEffect(()=> {
+		if (!user) return;
 
-	return (
+		userSessionContext.user.uid = user.sub || '';
+
+	}, [user?.sub])
+
+	return !isLoading ? (
 		<IonApp>
 			<IonReactRouter>
 				{
-					userSessionContext.user.uid ?
+					isAuthenticated ?
 						<>
 							<IonMenu side="start" contentId="superOrganizadorM1">
 								<IonHeader>
@@ -93,7 +87,11 @@ const App: React.FC = () => {
 				}
 			</IonReactRouter>
 		</IonApp >
-	);
+	) :
+		(<IonApp>
+			<div>Cargando...</div>
+		</IonApp>
+		);
 }
 
 export default App;

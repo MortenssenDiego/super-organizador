@@ -1,4 +1,3 @@
-import { UserCredential } from "@firebase/auth";
 import React, { useState } from "react";
 import UserSessionContext, { IUserSession, UserSessionModel } from "./user-session-context";
 
@@ -13,7 +12,7 @@ const UserSessionContextProvider: React.FC = (props) => {
         }
     );
 
-    const signInWithGoogle = (user: UserCredential) => { 
+    const signInWithGoogle = (user: any) => { 
         const newUserSession: IUserSession = {
             uid: user.user.uid,
             displayName: user.user.displayName || '',

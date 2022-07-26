@@ -4,12 +4,21 @@ import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import UserSessionContextProvider from './data/user/UserSessionContextProvider';
+import { Auth0Provider } from "@auth0/auth0-react";
 
 ReactDOM.render(
 	<React.StrictMode>
-		<UserSessionContextProvider>
-			<App />
-		</UserSessionContextProvider>
+		<Auth0Provider
+			domain="dev-za6-76vz.us.auth0.com"
+			clientId="NjSeqzdpa2UpKIdNYGXAMj26j15dhnL8"
+			audience="https://dev-za6-76vz.us.auth0.com/api/v2/"
+			scope="read:current_user update:current_user_metadata"
+			redirectUri={window.location.origin}
+		>
+			<UserSessionContextProvider>
+				<App />
+			</UserSessionContextProvider>
+		</Auth0Provider>
 	</React.StrictMode>,
 	document.getElementById('root')
 );

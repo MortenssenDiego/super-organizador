@@ -1,4 +1,3 @@
-import { UserCredential } from "firebase/auth";
 import React from "react";
 
 export interface IUserSession {
@@ -10,7 +9,7 @@ export interface IUserSession {
 
 export interface UserSessionModel {
     user: IUserSession;
-    signInWithGoogle: (user: UserCredential) => void;
+    signInWithGoogle: (user: any) => void;
 }
 
 const UserSessionContext = React.createContext<UserSessionModel>({
@@ -20,7 +19,7 @@ const UserSessionContext = React.createContext<UserSessionModel>({
         email: '',
         photoURL: ''
     },
-    signInWithGoogle: (user: UserCredential) => {}
+    signInWithGoogle: (user: any) => {}
 })
 
 export default UserSessionContext;

@@ -1,27 +1,30 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import React, { useState, useContext, useEffect } from "react";
+import { createEvent, endEvent, getAllEvents } from "../../services/EventsService";
 import UserSessionContext from "../user/user-session-context";
 import EventsContext, { Event, EventsContextModel, EventType } from "./events-context";
 
 const EventsContextProvider: React.FC = (props) => {
+    const { user } = useAuth0();
     const userSessionContext = useContext(UserSessionContext);
-
     const [events, setEvents] = useState<Event[]>([
     ]);
 
     useEffect(() => {
         const fetchData = async() => {
-            // const getEvents = await firebaseGetAllEvents(userSessionContext.user.uid);
-            setEvents([]);
-            // setEvents(getEvents);
+            if(!user?.sub) return;
+            const getEvents = await getAllEvents(user?.sub);
+            setEvents(getEvents);
         }
 
         fetchData().catch(console.error);
-    }, [events]);
+    }, []);
 
     const addEvent = async (title: string, description: string, date: string, eventType: EventType) => {
+        if(!user?.sub) return;
         const newEvent: Event = {
-            uid: userSessionContext.user.uid,
-            id: Math.random().toString(),
+            uid: user?.sub,
+            id: '',
             title,
             description,
             date,
@@ -29,7 +32,7 @@ const EventsContextProvider: React.FC = (props) => {
             isFinished: false
         }
 
-        // await firebaseSaveEvent(newEvent);
+        await createEvent(newEvent);
 
         setEvents(currEvents => {
             return[...currEvents, newEvent]
@@ -38,7 +41,7 @@ const EventsContextProvider: React.FC = (props) => {
 
     const finishEvent = async (eventId: string) => {
 
-        // await firebaseFinishEvent(eventId, userSessionContext.user.uid);
+        await endEvent(eventId);
 
         setEvents(currEvents => {
             const updatedEvents = [...currEvents];
