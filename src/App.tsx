@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useCallback } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar, setupIonicReact } from '@ionic/react';
 import { calendarOutline, homeOutline, sunny } from 'ionicons/icons'
@@ -26,7 +26,6 @@ import './theme/variables.css';
 import EventsContextProvider from './data/events/EventsContextProvider';
 import Events from './pages/Events/Events';
 import AddEvent from './pages/Events/AddEvent';
-import UserSessionContext from './data/user/user-session-context';
 
 /* User Authentication */
 import LoginButton from './pages/Authentication/LoginButton';
@@ -38,76 +37,90 @@ import { callbackUri } from './auth.config';
 setupIonicReact();
 
 const App: React.FC = () => {
-	const userSessionContext = useContext(UserSessionContext);
-	const { user, isAuthenticated, isLoading, handleRedirectCallback } = useAuth0();
+	const { isAuthenticated, isLoading, handleRedirectCallback } = useAuth0();
 
-	CapApp.addListener('appUrlOpen', async ({ url }) => {
-		if (url.startsWith(callbackUri)) {
-			if (
-			  url.includes("state") &&
-			  (url.includes("code") || url.includes("error"))
-			) {
-			  await handleRedirectCallback(url);
-			}
-		}
-		// No-op on Android
-		await Browser.close();
-	});
-
-	useEffect(() => {
-		if (!user) return;
-
-		userSessionContext.user.uid = user.sub || '';
-
-	}, [user?.sub])
-
-	return !isLoading ? (
-		<IonApp>
-			<IonReactRouter>
-				{
-					isAuthenticated ?
-						<>
-							<IonMenu side="start" contentId="superOrganizadorM1">
-								<IonHeader>
-									<IonToolbar>
-										<IonTitle><IonIcon color="warning" icon={sunny} size='large' /></IonTitle>
-									</IonToolbar>
-								</IonHeader>
-								<IonContent>
-									<IonList>
-										<IonMenuToggle>
-											<IonItem routerLink='/home' routerDirection='none' lines='none'>
-												<IonIcon color="medium" slot="start" icon={homeOutline} />
-												<IonLabel>Inicio</IonLabel>
-											</IonItem>
-										</IonMenuToggle>
-										<IonMenuToggle>
-											<IonItem routerLink='/events' routerDirection='none' lines='none'>
-												<IonIcon color="medium" slot="start" icon={calendarOutline} />
-												<IonLabel>Eventos</IonLabel>
-											</IonItem>
-										</IonMenuToggle>
-									</IonList>
-								</IonContent>
-							</IonMenu>
-							<EventsContextProvider>
-								<IonRouterOutlet id="superOrganizadorM1">
-									<Route exact path="/home" component={Home} />
-									<Route exact path="/events" component={Events} />
-									<Route exact path="/add-event" component={AddEvent} />
-									<Redirect to="/home" />
-								</IonRouterOutlet>
-							</EventsContextProvider>
-						</> :
-						<LoginButton />
+	const onInit = useCallback(
+		() => {
+			CapApp.addListener('appUrlOpen', async ({ url }) => {
+				if (url.startsWith(callbackUri)) {
+					if (
+						url.includes("state") &&
+						(url.includes("code") || url.includes("error"))
+					) {
+						await handleRedirectCallback(url);
+					}
 				}
-			</IonReactRouter>
-		</IonApp >
-	) :
-		(<IonApp>
-			<div>Cargando...</div>
+				// No-op on Android
+				await Browser.close();
+			});
+		},
+		[handleRedirectCallback]
+	);
+
+	useEffect(
+		() => {
+			onInit();
+		},
+		[]
+	);
+
+	return (
+		<IonApp>
+			{
+				isLoading && (
+					<div>Cargando...</div>
+				)
+			}
+			{
+				!isLoading && (
+					<IonReactRouter>
+						{
+							isAuthenticated && (
+								<>
+									<IonMenu side="start" contentId="superOrganizadorM1">
+										<IonHeader>
+											<IonToolbar>
+												<IonTitle><IonIcon color="warning" icon={sunny} size='large' /></IonTitle>
+											</IonToolbar>
+										</IonHeader>
+										<IonContent>
+											<IonList>
+												<IonMenuToggle>
+													<IonItem routerLink='/home' routerDirection='none' lines='none'>
+														<IonIcon color="medium" slot="start" icon={homeOutline} />
+														<IonLabel>Inicio</IonLabel>
+													</IonItem>
+												</IonMenuToggle>
+												<IonMenuToggle>
+													<IonItem routerLink='/events' routerDirection='none' lines='none'>
+														<IonIcon color="medium" slot="start" icon={calendarOutline} />
+														<IonLabel>Eventos</IonLabel>
+													</IonItem>
+												</IonMenuToggle>
+											</IonList>
+										</IonContent>
+									</IonMenu>
+									<EventsContextProvider>
+										<IonRouterOutlet id="superOrganizadorM1">
+											<Route exact path="/home" component={Home} />
+											<Route exact path="/events" component={Events} />
+											<Route exact path="/add-event" component={AddEvent} />
+											<Redirect to="/home" />
+										</IonRouterOutlet>
+									</EventsContextProvider>
+								</>
+							)
+						}
+						{
+							!isAuthenticated && (
+								<LoginButton />
+							)
+						}
+					</IonReactRouter>
+				)
+			}
 		</IonApp>
-		);
+	);
 }
 
 export default App;

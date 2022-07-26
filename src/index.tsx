@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
-import UserSessionContextProvider from './data/user/UserSessionContextProvider';
 import { Auth0Provider } from "@auth0/auth0-react";
 import { domain as auth0Domain, clientId, callbackUri } from "./auth.config";
 
@@ -17,9 +16,7 @@ ReactDOM.render(
 			useRefreshTokens
 			cacheLocation="localstorage"
 		>
-			<UserSessionContextProvider>
-				<App />
-			</UserSessionContextProvider>
+			<App />
 		</Auth0Provider>
 	</React.StrictMode>,
 	document.getElementById('root')

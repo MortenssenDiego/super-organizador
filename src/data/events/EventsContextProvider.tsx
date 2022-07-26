@@ -1,12 +1,10 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import React, { useState, useContext, useEffect } from "react";
 import { createEvent, endEvent, getAllEvents } from "../../services/EventsService";
-import UserSessionContext from "../user/user-session-context";
 import EventsContext, { Event, EventsContextModel, EventType } from "./events-context";
 
 const EventsContextProvider: React.FC = (props) => {
     const { user } = useAuth0();
-    const userSessionContext = useContext(UserSessionContext);
     const [events, setEvents] = useState<Event[]>([
     ]);
 
